@@ -9,7 +9,8 @@ const firebaseConfig = {
     messagingSenderId: "536079109042"
 };
 
-firebase.initializeApp(firebaseConfig);
+//firebase.initializeApp(firebaseConfig);
+export default !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
 
 export const userService = {
     signUp: (userModel) => {
@@ -21,7 +22,7 @@ export const userService = {
                 userModel.password
             ).then(credential => {
                 resolve(credential)
-            }).then(error => {
+            }).catch(error => {
                 reject(error.message)
             })
 
