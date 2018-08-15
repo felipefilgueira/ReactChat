@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button,TouchableOpacity } from 'react-native';
 import { userService } from '../../services/user-service'
 import Loading from '../../shared/components/loading'
 
@@ -52,7 +52,11 @@ export default class LogIn extends React.Component {
             <Loading loading={this.state.loading}>
 
                 <View style={styles.logoContainer}>
+                    <TouchableOpacity 
+                    
+                    onPress={() => this.props.navigation.navigate('SignUpScreen')}>
                     <View style={styles.logo}></View>
+                    </TouchableOpacity>
                 </View>
                 <View>
                     <TextInput

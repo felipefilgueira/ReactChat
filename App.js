@@ -4,7 +4,7 @@ import Login from './src/pages/Login/login'
 
 var stack = createStackNavigator({
   LoginScreen: Login,
-  SignUpScreen: SignUp
+  SignUpScreen: SignUp,
 }, {
   initialRouteName: 'LoginScreen'
 });
