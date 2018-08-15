@@ -10,6 +10,10 @@ const firebaseConfig = {
     messagingSenderId: "536079109042"
 };
 
+<<<<<<< HEAD
+=======
+//firebase.initializeApp(firebaseConfig);
+>>>>>>> 07fe31787a87dbc14368743e60e7000c0ec7b1ca
 export default !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
 
 export const userService = {
@@ -23,6 +27,7 @@ export const userService = {
             ).then(credential => {
                 resolve(credential)
             }).catch(error => {
+<<<<<<< HEAD
                 var messageToShow = "Ocorreu um erro inesperado.";
                 console.log(error.message)
                 switch (error.message) {
@@ -35,6 +40,9 @@ export const userService = {
                     
                 }
                 reject(messageToShow)
+=======
+                reject(error.message)
+>>>>>>> 07fe31787a87dbc14368743e60e7000c0ec7b1ca
             })
 
         });
