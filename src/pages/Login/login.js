@@ -3,19 +3,17 @@ import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import { userService } from '../../services/user-service'
 import Loading from '../../shared/components/loading'
 
-export default class signUp extends React.Component {
+export default class LogIn extends React.Component {
     static navigationOptions = (navigation) => {
         return {
             title: 'Sign Up',
-            
+            header: null
         }
     }
 
     state = {
         email: '',
         password: '',
-        name: '',
-        nickname: '',
         error: null,
         loading: false
     }
@@ -24,18 +22,16 @@ export default class signUp extends React.Component {
         const userModel = {
             email: this.state.email,
             password: this.state.password,
-            name: this.state.name,
-            nickname: this.state.nickname
         }
-        userService.signUp(userModel).then(credential => {
-            this.showHideLoading(false)
-            this.limpar()
-        }).catch(errorMessage => {
-            this.showHideLoading(false)
-            this.setState({
-                error: errorMessage
-            })
-        });
+        // userService.signUp(userModel).then(credential => {
+        //     this.showHideLoading(false)
+        //     this.limpar()
+        // }).catch(errorMessage => {
+        //     this.showHideLoading(false)
+        //     this.setState({
+        //         error: errorMessage
+        //     })
+        // });
     }
 
     showHideLoading(visible = true) {
@@ -48,8 +44,6 @@ export default class signUp extends React.Component {
         this.setState({
             email: '',
             password: '',
-            name: '',
-            nickname: ''
         })
     }
 
@@ -82,28 +76,6 @@ export default class signUp extends React.Component {
                     />
                     <TextInput />
 
-                    <TextInput
-                        style={styles.textInput}
-                        onChangeText={(name) => {
-                            this.setState({ name })
-                        }}
-                        value={this.state.name}
-                        autoCapitalize={'none'}
-                        placeholder={'Name'}
-                    />
-                    <TextInput />
-
-                    <TextInput
-                        style={styles.textInput}
-                        onChangeText={(nickname) => {
-                            this.setState({ nickname })
-                        }}
-                        value={this.state.nickname}
-                        autoCapitalize={'none'}
-                        placeholder={'Nickname'}
-                    />
-                    <TextInput />
-
 
                     {
                         this.state.error ? <View>
@@ -116,12 +88,19 @@ export default class signUp extends React.Component {
                     }
 
                     <Button
-                        title={'Sign Up'}
+                        title={'Login'}
                         onPress={() =>
                             this.setState({
-                                error: null ,
+                                error: null,
                                 loading: true
                             }, () => this.signUp())
+                        }
+                    />
+
+                    <Button
+                        title={'Cadastrar'}
+                        onPress={() =>
+                            this.props.navigation.navigate('SignUpScreen')
                         }
                     />
                 </View>
