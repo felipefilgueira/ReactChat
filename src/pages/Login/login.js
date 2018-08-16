@@ -18,20 +18,17 @@ export default class LogIn extends React.Component {
         loading: false
     }
 
-    signUp() {
-        const userModel = {
-            email: this.state.email,
-            password: this.state.password,
-        }
-        // userService.signUp(userModel).then(credential => {
-        //     this.showHideLoading(false)
-        //     this.limpar()
-        // }).catch(errorMessage => {
-        //     this.showHideLoading(false)
-        //     this.setState({
-        //         error: errorMessage
-        //     })
-        // });
+    login() {
+        userService
+            .login(this.state.email, this.state.password)
+                .then(credentials => {
+                    console.log(credentials);
+                    this.showHideLoading(false);
+                    this.props.navigation.navigate('ChatStack')
+                }).catch(error => {
+                    console.log(error.message);
+                    this.showHideLoading(false);
+                })
     }
 
     showHideLoading(visible = true) {
@@ -97,7 +94,7 @@ export default class LogIn extends React.Component {
                             this.setState({
                                 error: null,
                                 loading: true
-                            }, () => this.signUp())
+                            }, () => this.login())
                         }
                     />
 
