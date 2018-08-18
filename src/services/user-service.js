@@ -1,5 +1,6 @@
 import * as firebase from 'firebase';
 import { errorMessageService } from '../shared/common/error-message'
+import { AsyncStorage } from "react-native"
 
 const firebaseConfig = {
     apiKey: "AIzaSyAhUERkfcY7wZJ-BsgS8sjNfjCK5k861vM",
@@ -11,6 +12,7 @@ const firebaseConfig = {
 };
 
 export default !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
+const USER_STORAGE_NAME = "USER_DATA"
 
 export const userService = {
     signUp: (userModel) => {
@@ -33,7 +35,7 @@ export const userService = {
                     case "Password should be at least 6 characters":
                         messageToShow = errorMessageService.getErrorByName("password_min_6_digits");;
                         break;
-                    
+
                 }
                 reject(messageToShow)
             })
@@ -46,11 +48,64 @@ export const userService = {
         return new Promise((resolve, reject) => {
             firebase.auth()
                 .signInWithEmailAndPassword(email, password)
-                    .then(credential => {
-                        resolve(credential)
-                    }).catch(error => {
+                .then(credential => {
+                    resolve(credential)
+                }).catch(error => {
+                    reject(error);
+                });
+        })
+    },
+    sendMessage(message) {
+        var newMessage = {
+            message: message,
+            date: new Date().toISOString()
+        }
+
+        return new Promise((resolve, reject) => {
+            firebase
+                .database()
+                .ref('messages')
+                .push(newMessage, (error) => {
+                    if (error) {
                         reject(error);
-                    });
+                    }
+                    resolve(true);
+                })
+
+        })
+    },
+
+    getMessages: () => {
+        return firebase
+                .database()
+                .ref('messages')
+    },
+
+    setUser: (userModel) => {
+        return new Promise((resolve, reject) => {
+            AsyncStorage
+            .setItem(USER_STORAGE_NAME, JSON.stringify(userModel))
+            .then(() => {
+                resolve(true);
+            }, (error) => {
+                reject(error);
+            })
+        })
+    },
+
+    getUser: () => {
+        return new Promise((resolve, reject) => {
+            AsyncStorage
+                .getItem(USER_STORAGE_NAME)
+                .then(user => {
+                    resolve(JSON.parse(user));
+                }).catch(error => {
+                    reject(error);
+                })
         })
     }
+
+
+
 }
+

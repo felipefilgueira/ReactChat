@@ -1,25 +1,61 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native'
+import { StyleSheet, Text, View, FlatList, TextInput, Button, KeyboardAvoidingView } from 'react-native'
 import ChatMessage from '../../shared/components/chat-message';
+import { userService } from '../../services/user-service'
 
 export default class Chat extends React.Component {
+    state = {
+        message: '',
+        messages: [],
+        canSendMessage: false
+    }
+
+    componentDidMount() {
+        userService
+            .getMessages()
+            .on('value', (snapshot) => {
+
+                // var messagesObject = snapshot.val();
+                var messages = [];
+
+                snapshot.forEach(item => {
+                    console.log(item.key);
+                    console.log(item.val())
+
+                    messages.push({
+                        ...item.val(),
+                        uid: item.key
+                    })
+
+                })
+
+                this.setState({
+                    messages
+                })
+
+                // var messagesObject = snapshot.val();
+                // var messages = [];
+
+                // for( var uid in messagesObject) {
+                //     messages.push({
+                //         ...messagesObject[uid],
+                //         id: uid
+                //     });
+                // }
+            })
+
+    }
+
+    sendMessage() {
+        userService.sendMessage(this.state.message)
+            .then(() => {
+                this.setState({
+                    message: '',
+                    canSendMessage: false
+                });
+            })
+    }
     render() {
-        var messages = [
-            {
-                id: 1,
-                message: "Minha Mensagem",
-                nickname: 'felipe',
-                date: new Date().toISOString(),
-                fromMe: true
-            },
-            {
-                id: 2,
-                message: "Sua Mensagem",
-                nickname: 'abc1',
-                date: new Date().toISOString(),
-                fromMe: false
-            },
-        ]
         return (
             <View style={styles.container}>
                 <View style={{
@@ -28,22 +64,79 @@ export default class Chat extends React.Component {
                     width: '100%'
                 }} >
                     <FlatList
-                        data={messages}
-                        renderItem={({ item }) => <ChatMessage teste={item} />}
-                        keyExtractor={(item) => item.id.toString()}
+                        ref={(flatlistref) => {
+                            this.flatList = flatlistref;
+                        }}
+                        data={this.state.messages}
+                        onContentSizeChange={() => this.flatList.scrollToEnd({ animated: true })}
+                        renderItem={({ item }) =>  <ChatMessage message={item}
+                            />
+                            
+                        }
+                        keyExtractor={(item) => item.uid.toString()}
                     />
                 </View>
-                <View style={{
-                    height: 30,
-                    width: '100%'
 
-                }} >
-                    <TextInput
-                        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-                        onChangeText={(message) => this.setState({ message })}
+                <KeyboardAvoidingView  style={{ height: 50, width: '100%' }} behavior="padding" keyboardVerticalOffset={100} >
+                    <View style={{
+                        height: 40,
+                        width: '100%',
+                        paddingLeft: 15,
+                        paddingRight: 15
 
-                    />
-                </View>
+                    }} >
+
+                        <View style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }
+                        }>
+
+                            <View style={{
+                                marginBottom: 10,
+                                height: 40,
+                                flexGrow: 1,
+   
+                            }}>
+                                <TextInput
+                                    style={{
+                                        height: 40,
+                                        borderColor: 'gray',
+                                        borderWidth: 1,
+
+                                    }}
+                                    onChangeText={(message) => {
+                                        this.setState({ 
+                                            message,
+                                            canSendMessage: message != ''
+                                        })
+                                    }}
+                                    value={this.state.message}
+                                />
+                            </View>
+
+                            <View style={{
+                                marginBottom: 20,
+                                height: 40,
+                            }}>
+                                <Button
+                                    title={'Enviar'}
+                                    disabled={!this.state.canSendMessage}
+                                    onPress={() => {
+                                        this.setState({
+                                            canSendMessage: false
+                                        }, () => {
+                                            this.sendMessage();
+                                        })
+                                    }} />
+                            </View>
+
+
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
             </View>
         )
     }
