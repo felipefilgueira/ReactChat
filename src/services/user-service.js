@@ -49,6 +49,15 @@ export const userService = {
             firebase.auth()
                 .signInWithEmailAndPassword(email, password)
                 .then(credential => {
+                    var userObject = {
+                        email: email,
+                        uid: credential.user.uid
+                    }
+                    userService
+                        .setUser(userObject)
+                        .then(() => {
+                            resolve(credential)
+                        });
                     resolve(credential)
                 }).catch(error => {
                     reject(error);
@@ -62,34 +71,40 @@ export const userService = {
         }
 
         return new Promise((resolve, reject) => {
-            firebase
-                .database()
-                .ref('messages')
-                .push(newMessage, (error) => {
-                    if (error) {
-                        reject(error);
-                    }
-                    resolve(true);
-                })
+            userService.getUser().then(user => {
+                newMessage = {
+                    ...newMessage,
+                    uid: user.uid
+                }
+                firebase
+                    .database()
+                    .ref('messages')
+                    .push(newMessage, (error) => {
+                        if (error) {
+                            reject(error);
+                        }
+                        resolve(true);
+                    })
 
+            })
         })
     },
 
     getMessages: () => {
         return firebase
-                .database()
-                .ref('messages')
+            .database()
+            .ref('messages')
     },
 
     setUser: (userModel) => {
         return new Promise((resolve, reject) => {
             AsyncStorage
-            .setItem(USER_STORAGE_NAME, JSON.stringify(userModel))
-            .then(() => {
-                resolve(true);
-            }, (error) => {
-                reject(error);
-            })
+                .setItem(USER_STORAGE_NAME, JSON.stringify(userModel))
+                .then(() => {
+                    resolve(true);
+                }, (error) => {
+                    reject(error);
+                })
         })
     },
 
