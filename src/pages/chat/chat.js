@@ -4,46 +4,64 @@ import ChatMessage from '../../shared/components/chat-message';
 import { userService } from '../../services/user-service'
 
 export default class Chat extends React.Component {
+    static navigationOptions = ({ navigation }) => {
+        return {
+            headerRight: navigation.getParam('headerRight', null)
+        }
+    }
+
+
     state = {
         message: '',
         messages: [],
-        canSendMessage: false
+        canSendMessage: false,
+        user: '',
+    }
+
+    logout() {
+        userService.logout().then(response => {
+            this.props.navigation.navigate('SigupStack');
+        })
     }
 
     componentDidMount() {
+        this.props.navigation.setParams({
+            headerRight: <Button
+                title={'Logout'}
+                color={'red'}
+                onPress={() => {
+                    this.logout();
+                }}
+            />
+        })
+        userService.getUser().then(user => {
+            this.setState({
+                user: user
+            }, () => { this.loadMessages() })
+        })
+
+
+    }
+
+    loadMessages() {
         userService
             .getMessages()
             .on('value', (snapshot) => {
 
-                // var messagesObject = snapshot.val();
                 var messages = [];
 
                 snapshot.forEach(item => {
-                    console.log(item.key);
-                    console.log(item.val())
 
                     messages.push({
                         ...item.val(),
-                        uid: item.key
+                        messageId: item.key
                     })
-
                 })
 
                 this.setState({
                     messages
                 })
-
-                // var messagesObject = snapshot.val();
-                // var messages = [];
-
-                // for( var uid in messagesObject) {
-                //     messages.push({
-                //         ...messagesObject[uid],
-                //         id: uid
-                //     });
-                // }
             })
-
     }
 
     sendMessage() {
@@ -69,15 +87,15 @@ export default class Chat extends React.Component {
                         }}
                         data={this.state.messages}
                         onContentSizeChange={() => this.flatList.scrollToEnd({ animated: true })}
-                        renderItem={({ item }) =>  <ChatMessage message={item}
-                            />
-                            
+                        renderItem={({ item }) => <ChatMessage fromMe={item.uid == this.state.user.uid} message={item}
+                        />
+
                         }
-                        keyExtractor={(item) => item.uid.toString()}
+                        keyExtractor={(item) => item.messageId.toString()}
                     />
                 </View>
 
-                <KeyboardAvoidingView  style={{ height: 50, width: '100%' }} behavior="padding" keyboardVerticalOffset={100} >
+                <KeyboardAvoidingView style={{ height: 50, width: '100%' }} behavior="padding" keyboardVerticalOffset={100} >
                     <View style={{
                         height: 40,
                         width: '100%',
@@ -98,7 +116,7 @@ export default class Chat extends React.Component {
                                 marginBottom: 10,
                                 height: 40,
                                 flexGrow: 1,
-   
+
                             }}>
                                 <TextInput
                                     style={{
@@ -108,7 +126,7 @@ export default class Chat extends React.Component {
 
                                     }}
                                     onChangeText={(message) => {
-                                        this.setState({ 
+                                        this.setState({
                                             message,
                                             canSendMessage: message != ''
                                         })

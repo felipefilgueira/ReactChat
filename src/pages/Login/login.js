@@ -134,6 +134,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         width: 250,
         paddingLeft: 10
-    }
+    },
 
 });

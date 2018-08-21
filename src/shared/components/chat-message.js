@@ -3,14 +3,15 @@ import { StyleSheet, Text, View } from 'react-native'
 
 export default class ChatMessage extends React.Component {
     render() {
-        var messageFromMe = this.props.message.fromMe;
+        var messageFromMe = this.props.fromMe;
         return (
             <View style={[
                 styles.messageContainer,
                 messageFromMe ? styles.messageContainerFromMe : null
             ]}>
                 {/* Image */}
-                <View style={styles.chatImage}>
+                <View style={messageFromMe ? styles.chatImageFromMe: styles.chatImage}>
+                    
                 </View>
                 <View style={[
                     styles.chatMessage,
@@ -35,6 +36,12 @@ export default class ChatMessage extends React.Component {
 }
 
 const styles = StyleSheet.create({
+    chatImageFromMe: {
+        width: 60,
+        height: 60,
+        borderRadius: 500,
+        backgroundColor: 'red'
+    },
     chatImage: {
         width: 60,
         height: 60,

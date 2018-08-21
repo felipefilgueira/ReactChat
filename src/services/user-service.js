@@ -74,7 +74,7 @@ export const userService = {
             userService.getUser().then(user => {
                 newMessage = {
                     ...newMessage,
-                    uid: user.uid
+                    uid: user ? user.uid : ''
                 }
                 firebase
                     .database()
@@ -118,7 +118,16 @@ export const userService = {
                     reject(error);
                 })
         })
+    },
+
+    logout: () => {
+        return new Promise((resolve,reject) => {
+            AsyncStorage.clear().then(() => {
+                resolve(true)
+            })
+        })
     }
+
 
 
 
